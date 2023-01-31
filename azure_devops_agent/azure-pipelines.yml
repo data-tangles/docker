@@ -6,7 +6,19 @@ trigger:
     include:
       - azure_devops_agent/*
 
-        
+jobs:
+  - job: 'ACRImageBuild'
+    displayName: 'Build Image on ACR'
+    pool: 'Azure Pipelines'
+  
+    steps:
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription: 'Visual Studio Enterprise Subscription - MPN'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: 'az acr build --image $(IMAGE):v1.0 --registry $(ACR) --file Dockerfile .'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/azure_devops_agent/'
 
 
 
