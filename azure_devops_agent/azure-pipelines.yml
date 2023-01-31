@@ -1,0 +1,11 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - azure_devops_agent/*
+
+
+
+
