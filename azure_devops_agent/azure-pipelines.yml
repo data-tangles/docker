@@ -17,7 +17,7 @@ jobs:
         azureSubscription: 'Visual Studio Enterprise Subscription - MPN'
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
-        inlineScript: 'az acr build --image $(IMAGE):v1.0 --registry $(ACR) --file Dockerfile .'
+        inlineScript: 'az acr build --image $(IMAGE):v1.0 --registry $(ACR) --file dockerfile .'
         workingDirectory: '$(System.DefaultWorkingDirectory)/azure_devops_agent/'
 
 
