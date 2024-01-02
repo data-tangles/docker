@@ -42,7 +42,7 @@ jobs:
             ANSIBLE_VERSION=${{ env.ANSIBLE_VERSION }}
             ANSIBLE_LINT=${{ env.ANSIBLE_LINT }}
           push: true
-          tags: data-tangles/ansible:latest
+          tags: ghcr.io/data-tangles/ansible:latest
           
 
 
