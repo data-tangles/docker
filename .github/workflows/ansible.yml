@@ -1,0 +1,48 @@
+name: Build Ansible image
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - ansible/*
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  ANSIBLE_CORE_VERSION: 2.13.11
+  ANSIBLE_VERSION: 6.7.0
+  ANSIBLE_LINT: 6.19.0
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      packages: write
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: "{{defaultContext}}:ansible"
+          build-args: |
+            ANSIBLE_CORE_VERSION=${{ env.ANSIBLE_CORE_VERSION }}
+            ANSIBLE_VERSION=${{ env.ANSIBLE_VERSION }}
+            ANSIBLE_LINT=${{ env.ANSIBLE_LINT }}
+          push: true
+          tags: data-tangles/ansible:latest
+          
+
+
