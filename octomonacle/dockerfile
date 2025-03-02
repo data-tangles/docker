@@ -1,0 +1,28 @@
+# syntax=docker/dockerfile:1
+# check=skip=SecretsUsedInArgOrEnv #Ignoring due to ENV values not containing any value by default
+
+# Use a lightweight Python image
+FROM python:3.13.2
+
+LABEL maintainer="Cuan Leo (github.com/data-tangles)"
+
+# Set the working directory
+WORKDIR /app
+
+# Copy application files
+COPY . .
+
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Set environment variables inside the container
+ENV CLIENT_ID=""
+ENV CLIENT_SECRET=""
+ENV SECRET_KEY=""
+ENV WORKERS=4
+
+# Expose the port Flask runs on
+EXPOSE 5000
+
+# Start the application
+CMD ["sh", "-c", "gunicorn -w ${WORKERS:-4} -b 0.0.0.0:5000 app:app"]

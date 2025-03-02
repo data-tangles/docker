@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="static/images/favicon.ico">
+    <title>GitHub Workflow Runs</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            color: #333;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .logout-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            position: absolute;
+            right: 20px;
+            top: 20px;
+        }
+
+        .logout-button:hover {
+            background-color: #c82333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+        }
+
+        th:hover {
+            background-color: #0056b3;
+        }
+
+        .sort-arrow {
+            margin-left: 8px;
+            font-size: 14px;
+        }
+
+        .status-success { color: #28a745; font-weight: bold; }
+        .status-failed { color: #dc3545; font-weight: bold; }
+        .status-in_progress { color: #f39c12; font-weight: bold; }
+
+        .view-button {
+            background-color: #007bff;
+            color: white;
+            padding: 6px 12px;
+            text-decoration: none;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .dark-mode {
+            background-color: #1e1e1e;
+            color: #f4f4f4;
+        }
+
+        .dark-mode .container {
+            background: #2c2c2c;
+        }
+
+        .dark-mode th {
+            background: #444;
+        }
+
+        .dark-mode .view-button {
+            background-color: #28a745;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container content" id="content">
+        <button class="logout-button" onclick="window.location.href='/logout'">Logout</button>
+        <button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+
+        <h1>GitHub Workflow Runs</h1>
+
+        <!-- Personal Repositories -->
+        <h2>Personal Repositories</h2>
+        <table id="personalTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable('personalTable', 0)">Repo Name <span class="sort-arrow"></span></th>
+                    <th onclick="sortTable('personalTable', 1)">Branch <span class="sort-arrow"></span></th>
+                    <th onclick="sortTable('personalTable', 2)">Event <span class="sort-arrow"></span></th>
+                    <th onclick="sortTable('personalTable', 3)">Triggered By <span class="sort-arrow"></span></th>
+                    <th onclick="sortTable('personalTable', 4)">Status <span class="sort-arrow"></span></th>
+                    <th onclick="sortTable('personalTable', 5)">Last Run <span class="sort-arrow"></span></th>
+                    <th>Link</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for repo, runs in workflow_data.personal_repos.items() %}
+                    {% for run in runs %}
+                    <tr class="workflow-row" data-status="{{ run.conclusion or 'in_progress' }}">
+                        <td>{{ repo }}</td>
+                        <td>{{ run.head_branch }}</td>
+                        <td>{{ run.event }}</td>
+                        <td>{{ run.triggering_actor.login }}</td>
+                        <td class="{% if run.conclusion == 'failure' %}status-failed{% elif run.conclusion == 'success' %}status-success{% else %}status-in_progress{% endif %}">
+                            {{ run.conclusion or 'in_progress' }}
+                        </td>
+                        <td>{{ run.run_started_at | default('Unknown') }}</td>
+                        <td>
+                            <a class="view-button" href="{{ run.html_url }}" target="_blank">View Workflow</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td colspan="7">No workflow runs found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Organization Repositories -->
+        <h2>Organization Repositories</h2>
+        <table id="organizationTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable('organizationTable', 0)">Repo Name <span class="sort-arrow"></span></th>
+                    <th onclick="sortTable('organizationTable', 1)">Branch <span class="sort-arrow"></span></th>
+                    <th onclick="sortTable('organizationTable', 2)">Event <span class="sort-arrow"></span></th>
+                    <th onclick="sortTable('organizationTable', 3)">Triggered By <span class="sort-arrow"></span></th>
+                    <th onclick="sortTable('organizationTable', 4)">Status <span class="sort-arrow"></span></th>
+                    <th onclick="sortTable('organizationTable', 5)">Last Run <span class="sort-arrow"></span></th>
+                    <th>Link</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for repo, runs in workflow_data.org_repos.items() %}
+                    {% for run in runs %}
+                    <tr class="workflow-row" data-status="{{ run.conclusion or 'in_progress' }}">
+                        <td>{{ repo }}</td>
+                        <td>{{ run.head_branch }}</td>
+                        <td>{{ run.event }}</td>
+                        <td>{{ run.triggering_actor.login }}</td>
+                        <td class="{% if run.conclusion == 'failure' %}status-failed{% elif run.conclusion == 'success' %}status-success{% else %}status-in_progress{% endif %}">
+                            {{ run.conclusion or 'in_progress' }}
+                        </td>
+                        <td>{{ run.run_started_at | default('Unknown') }}</td>
+                        <td>
+                            <a class="view-button" href="{{ run.html_url }}" target="_blank">View Workflow</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td colspan="7">No workflow runs found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark-mode");
+        }
+
+        function sortTable(tableId, columnIndex) {
+            var table = document.getElementById(tableId);
+            var rows = Array.from(table.rows).slice(1);
+            var ascending = table.getAttribute("data-sort-order") !== "asc";
+
+            rows.sort(function(a, b) {
+                var cellA = a.cells[columnIndex].innerText.trim().toLowerCase();
+                var cellB = b.cells[columnIndex].innerText.trim().toLowerCase();
+                return ascending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+            });
+
+            rows.forEach(row => table.appendChild(row));
+            table.setAttribute("data-sort-order", ascending ? "asc" : "desc");
+        }
+    </script>
+
+</body>
+</html>
