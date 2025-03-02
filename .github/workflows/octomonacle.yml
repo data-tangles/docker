@@ -57,8 +57,8 @@ jobs:
         uses: actions/create-github-app-token@v1
         id: generate-token
         with:
-          app_id: ${{ secrets.TANGLES_BOT_APP_ID }}
-          private_key: ${{ secrets.TANGLES_BOT_PRIVATE_KEY }}
+          app-id: ${{ secrets.TANGLES_BOT_APP_ID }}
+          private-key: ${{ secrets.TANGLES_BOT_PRIVATE_KEY }}
 
       - name: Checkout 🔔
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
