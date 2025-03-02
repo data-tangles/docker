@@ -1,3 +1,6 @@
+# syntax=docker/dockerfile:1
+# check=skip=SecretsUsedInArgOrEnv #Ignoring due to ENV values not containing any value by default
+
 # Use a lightweight Python image
 FROM python:3.13.2
 
@@ -22,4 +25,4 @@ ENV WORKERS=4
 EXPOSE 5000
 
 # Start the application
-CMD sh -c "gunicorn -w ${WORKERS:-4} -b 0.0.0.0:5000 app:app"
+CMD ["sh", "-c", "gunicorn -w ${WORKERS:-4} -b 0.0.0.0:5000 app:app"]
